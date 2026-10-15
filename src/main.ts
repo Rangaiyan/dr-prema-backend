@@ -30,4 +30,9 @@ async function bootstrap() {
   await app.listen(port);
   console.log(`[boot] listening on ${port}`);
 }
-await bootstrap();
+// Not awaited: Vercel's runtime waits for this module to finish loading before it serves requests,
+// so a top-level await on listen() can deadlock startup.
+bootstrap().catch((err) => {
+  console.error('[boot] failed to start', err);
+  process.exit(1);
+});

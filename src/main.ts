@@ -10,7 +10,9 @@ const helmetFn = ((helmet as unknown as { default?: typeof helmet }).default ??
   helmet) as unknown as (typeof import('helmet'))['default'];
 
 async function bootstrap() {
+  console.log('[boot] creating Nest app');
   const app = await NestFactory.create(AppModule);
+  console.log('[boot] app created');
   const config = app.get(ConfigService);
 
   app.use(helmetFn());
@@ -24,6 +26,8 @@ async function bootstrap() {
   );
   app.enableShutdownHooks();
 
-  await app.listen(config.get<number>('PORT', 4000));
+  const port = config.get<number>('PORT', 4000);
+  await app.listen(port);
+  console.log(`[boot] listening on ${port}`);
 }
 await bootstrap();

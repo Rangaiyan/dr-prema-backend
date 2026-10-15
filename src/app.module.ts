@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { RateLimitGuard } from './common/guards/rate-limit.guard.js';
 import { validateEnv } from './config/env.validation.js';
 import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter.js';
 import { PrismaModule } from './prisma/prisma.module.js';
@@ -19,7 +19,6 @@ import { HealthController } from './health/health.controller.js';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }),
-    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 120 }]),
     PrismaModule,
     CloudinaryModule,
     AuthModule,
@@ -33,7 +32,7 @@ import { HealthController } from './health/health.controller.js';
   ],
   controllers: [HealthController],
   providers: [
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_GUARD, useClass: RateLimitGuard },
     { provide: APP_FILTER, useClass: PrismaExceptionFilter },
   ],
 })
